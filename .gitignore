@@ -1,0 +1,6 @@
+/vendor/
+/.env
+/docker-compose.override.yml
+mysql_data/
+redis_data/
+*.log
