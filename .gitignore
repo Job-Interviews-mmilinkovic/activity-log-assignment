@@ -1,6 +1,5 @@
 /vendor/
 /.env
-/docker-compose.override.yml
-mysql_data/
-redis_data/
+/docker-compose-override.yml
 *.log
+.idea/
