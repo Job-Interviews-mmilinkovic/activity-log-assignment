@@ -1,4 +1,4 @@
-# Portfolio SaaS - AI Agent Instructions
+# Activity Log — AI Agent Instructions
 
 ## Mission
 
