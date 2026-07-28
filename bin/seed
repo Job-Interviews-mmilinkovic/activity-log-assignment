@@ -1,0 +1,13 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+$seederFile = $argv[1] ?? 'Database\\Seeders\\DatabaseSeeder';
+
+$seeder = new $seederFile();
+$seeder->run();
+
+echo "Seeder {$seederFile} complete.\n";

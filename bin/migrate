@@ -1,0 +1,54 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use App\Database\DatabaseManager;
+
+DatabaseManager::boot();
+
+$action = $argv[1] ?? 'up';
+$migrationsDir = __DIR__ . '/../database/migrations';
+
+$files = glob($migrationsDir . '/*.php');
+sort($files);
+
+if ($action === 'up') {
+    foreach ($files as $file) {
+        $migration = require $file;
+        $name = basename($file);
+        echo "Running migration: {$name}\n";
+        $migration->up();
+    }
+    echo "All migrations complete.\n";
+} elseif ($action === 'down') {
+    $files = array_reverse($files);
+    foreach ($files as $file) {
+        $migration = require $file;
+        $name = basename($file);
+        echo "Rolling back: {$name}\n";
+        $migration->down();
+    }
+    echo "All rollbacks complete.\n";
+} elseif ($action === 'refresh') {
+    $files = array_reverse($files);
+    foreach ($files as $file) {
+        $migration = require $file;
+        $name = basename($file);
+        echo "Rolling back: {$name}\n";
+        $migration->down();
+    }
+    sort($files);
+    foreach ($files as $file) {
+        $migration = require $file;
+        $name = basename($file);
+        echo "Running migration: {$name}\n";
+        $migration->up();
+    }
+    echo "Refresh complete.\n";
+} else {
+    echo "Usage: php bin/migrate [up|down|refresh]\n";
+    exit(1);
+}

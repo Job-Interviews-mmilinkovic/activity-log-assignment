@@ -3,13 +3,17 @@
     "description": "Activity Log PHP Project",
     "type": "project",
     "require": {
-        "php": ">=8.5"
+        "php": ">=8.3",
+        "illuminate/database": "*"
     },
-    "require-dev": {},
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
-        }
+            "App\\": "src/",
+            "Database\\Seeders\\": "database/seeders/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "scripts": {
         "start": "php -S 0.0.0.0:8080 -t public"
