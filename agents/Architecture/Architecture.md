@@ -45,20 +45,6 @@ Middleware must never contain business logic.
 
 ---
 
-## Request Validation
-
-Every request must be validated using Laravel Form Request classes.
-
-Responsibilities:
-
-* Input validation
-* Authorization (when appropriate)
-* Input normalization (when necessary)
-
-Controllers must assume validated data only.
-
----
-
 ## Controllers
 
 Controllers are responsible only for coordinating the request.

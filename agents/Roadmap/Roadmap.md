@@ -1,259 +1,78 @@
-# Product Roadmap
+# Activity Log Tracker — Roadmap
 
-# Product Vision
+## Product Vision
 
-The goal of this project is to create a SaaS platform that allows users to create professional portfolio websites and CV documents without needing technical knowledge.
-
-Users provide their professional information through a guided onboarding process, choose a design template, and receive:
-
-* A live personal portfolio website
-* A downloadable CV
-* A dashboard where they can update their information anytime
-
-The main idea:
-
-> Store career information once and automatically generate professional presentation formats from that data.
+A simple web application that tracks user activity events (login, logout, page views, button clicks) and provides administrators with statistics and reports.
 
 ---
 
-# Core Product Concept
+## Phase 1 — Foundation
 
-The platform consists of three main parts:
-
-## 1. Portfolio Builder
-
-A guided process where users enter:
-
-* Personal information
-* About section
-* Skills
-* Experience
-* Projects
-* Education
-* Services
-* Contact information
-
-The system transforms this structured data into a professional portfolio website.
-
----
-
-## 2. Portfolio Themes
-
-Users can select different portfolio designs.
-
-Each theme contains:
-
-* Unique layout
-* Styling
-* Assets
-* Fonts
-* CSS
-* JavaScript behavior
-
-Themes are independent from application logic.
-
-The application provides data, and the theme decides how the data is presented.
-
----
-
-## 3. CV Generator
-
-Users can generate a professional CV from the same data used for their portfolio.
-
-The CV must always reflect the latest changes from the dashboard.
-
----
-
-# Development Roadmap
-
----
-
-# Phase 1 - Foundation
-
-Goal: Create the base application architecture.
+Goal: Set up authentication and the core database structure.
 
 Features:
+- User registration, login, logout
+- Session-based auth
+- Activity events table (user, action, timestamp, metadata)
+- Database migrations for users and events
+- Basic routing system
 
-* Laravel project setup
-* Authentication
-* User management
-* Database structure
-* Basic dashboard
-* Application architecture setup
-* Theme loading system foundation
+Done when: A user can register, log in, and log out; every auth action is recorded as an event.
 
 ---
 
-# Phase 2 - Portfolio Builder MVP
+## Phase 2 — Core Pages
 
-Goal: Allow users to create their first portfolio.
+Goal: Build the two main user-facing pages and wire up activity tracking.
 
 Features:
+- Page A with "Buy a cow" button (click hides button, shows "thank you")
+- Page B with "Download" button (triggers .exe download)
+- Track `view-page` and `button-click` events
 
-## Personal Information
-
-Users can manage:
-
-* Name
-* Profile picture
-* Title
-* Location
-* Contact information
-* Social links
-
-## About Me
-
-Users can create:
-
-* Biography
-* Short introduction
-* Professional summary
-
-## Skills
-
-Users can add:
-
-* Technical skills
-* Soft skills
-* Skill categories
-
-## Experience
-
-Users can manage:
-
-* Companies
-* Positions
-* Dates
-* Responsibilities
-* Technologies
-
-## Projects
-
-Users can manage:
-
-* Project name
-* Description
-* Images
-* Links
-* Technologies
+Done when: Anonymous and authenticated page views and button clicks are all logged.
 
 ---
 
-# Phase 3 - Portfolio Publishing
+## Phase 3 — Admin Statistics
 
-Goal: Generate public portfolio websites.
+Goal: Give admins a filterable table of all activity events.
 
 Features:
+- Admin-only /stats page
+- Table with columns: date, user, action
+- Date range filter
+- User filter
+- Action type filter (login, logout, registration, view-page, button-click)
 
-* Public portfolio URL
-* Template selection
-* Template rendering system
-* SEO metadata
-* Responsive layouts
-* Custom sections ordering
+Done when: An admin can filter events by any combination of date, user, and action.
 
 ---
 
-# Phase 4 - CV Generation
+## Phase 4 — Reports
 
-Goal: Generate professional CV documents.
+Goal: Provide aggregated reports with graphs and summary tables.
 
 Features:
+- Admin-only /reports page
+- Line graph: dates on X-axis, event counts on Y-axis (page view A, page view B, click "Buy a cow", click "Download")
+- Summary table: date, count per event type
+- Date range selector
 
-* PDF generation
-* Multiple CV layouts
-* Download functionality
-* CV preview
-* Automatic synchronization with portfolio data
+Done when: An admin can view trends and daily counts for the four tracked actions.
 
 ---
 
-# Phase 5 - Subscription System
+## Phase 5 — Polish & Hardening
 
-Goal: Turn the application into a SaaS product.
+Goal: Handle edge cases, improve UX, and prepare for production use.
 
 Features:
+- Input validation and error handling
+- Rate limiting on auth endpoints
+- Proper .exe download file delivery
+- Responsive layout for all pages
+- README with setup instructions
+- Seed data for development
 
-* Free plan
-* Premium plans
-* Payment integration
-* Subscription management
-* Feature restrictions
-* Billing history
-
----
-
-# Phase 6 - Advanced Portfolio Features
-
-Features:
-
-## Additional Sections
-
-* Blog
-* Testimonials
-* Certifications
-* Education
-* Services
-
-## Customization
-
-* Colors
-* Fonts
-* Theme settings
-* Custom sections
-
-## Domain Management
-
-* Custom domains
-* SSL handling
-* DNS verification
-
----
-
-# Phase 7 - AI Features
-
-Goal: Help users create better professional profiles.
-
-Features:
-
-* AI generated About section
-* Improve experience descriptions
-* Rewrite project descriptions
-* CV optimization
-* Cover letter generation
-* Job description matching
-
----
-
-# Long-Term Vision
-
-The platform becomes a complete career management system.
-
-Users maintain one professional profile that can generate:
-
-* Portfolio website
-* CV
-* Cover letters
-* Job applications
-* Professional presentations
-
-The user's career information becomes a reusable professional identity.
-
----
-
-# Success Criteria
-
-The MVP is successful when:
-
-* A user can register
-* Choose a template
-* Fill required information
-* Publish a portfolio
-* Download a CV
-* Update information later without rebuilding anything
-
-The first goal is not building every feature.
-
-The first goal is proving:
-
-> People want an easy way to maintain their professional online presence.
+Done when: The app can be set up from scratch and used without errors.

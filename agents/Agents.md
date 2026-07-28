@@ -2,7 +2,7 @@
 
 ## Mission
 
-Build a production-ready Portfolio SaaS.
+Build a User Activity Tracking System.
 
 Priorities:
 
@@ -19,11 +19,10 @@ Never optimize prematurely.
 
 ## Tech Stack
 
-Laravel 12 - MVC
-PHP 8.2
+PHP 8.5
 MySQL
 Redis
-Homestead (Docker in the future)
+Docker
 HTML, CSS, JS/JQuery
 
 ---
