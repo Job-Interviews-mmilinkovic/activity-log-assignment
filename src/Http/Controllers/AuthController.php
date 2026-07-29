@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Bootstrap\Auth;
 use App\Bootstrap\DatabaseManager;
+use App\Services\ValidationService\Contracts\ValidatorServiceInterface;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
@@ -13,6 +14,11 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class AuthController
 {
+    public function __construct(
+        private readonly ValidatorServiceInterface $validator,
+    ) {
+    }
+
     public function loginForm(): HtmlResponse
     {
         return $this->render('auth/login');
@@ -20,14 +26,17 @@ class AuthController
 
     public function login(ServerRequestInterface $request): HtmlResponse|RedirectResponse
     {
-        $body = $request->getParsedBody();
-        $email = $body['email'] ?? '';
-        $password = $body['password'] ?? '';
+        $result = $this->validator->validateLogin($request->getParsedBody());
 
-        $result = Auth::instance()->login($email, $password);
+        if (!$result->isValid()) {
+            return $this->render('auth/login', ['error' => $result->getFirstError()]);
+        }
 
-        if ($result['error']) {
-            return $this->render('auth/login', ['error' => $result['message']]);
+        $dto = $result->getData();
+        $authResult = Auth::instance()->login($dto->email, $dto->password);
+
+        if ($authResult['error']) {
+            return $this->render('auth/login', ['error' => $authResult['message']]);
         }
 
         return new RedirectResponse('/');
@@ -40,31 +49,25 @@ class AuthController
 
     public function register(ServerRequestInterface $request): HtmlResponse|RedirectResponse
     {
-        $body = $request->getParsedBody();
-        $email = $body['email'] ?? '';
-        $password = $body['password'] ?? '';
-        $repeat = $body['password_repeat'] ?? '';
-        $name = $body['name'] ?? '';
+        $result = $this->validator->validateRegister($request->getParsedBody());
 
-        if ($password !== $repeat) {
-            return $this->render('auth/register', ['error' => 'Passwords do not match.']);
+        if (!$result->isValid()) {
+            return $this->render('auth/register', ['error' => $result->getFirstError()]);
         }
 
-        if (strlen($password) < 3) {
-            return $this->render('auth/register', ['error' => 'Password must be at least 3 characters.']);
-        }
+        $dto = $result->getData();
 
         DatabaseManager::boot();
 
-        $existing = Capsule::table('users')->where('email', $email)->first();
+        $existing = Capsule::table('users')->where('email', $dto->email)->first();
         if ($existing) {
             return $this->render('auth/register', ['error' => 'Email is already taken.']);
         }
 
         Capsule::table('users')->insert([
-            'email'    => $email,
-            'password' => password_hash($password, PASSWORD_BCRYPT, ['cost' => 10]),
-            'name'     => $name,
+            'email'    => $dto->email,
+            'password' => password_hash($dto->password, PASSWORD_BCRYPT, ['cost' => 10]),
+            'name'     => $dto->name,
             'role_id'  => 2,
             'isactive' => 1,
         ]);

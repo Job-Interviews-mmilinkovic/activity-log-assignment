@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Bootstrap;
 
+use App\Container\Container;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use Laminas\Diactoros\Response;
@@ -15,8 +16,9 @@ class Router implements RequestHandlerInterface
 {
     private Dispatcher $dispatcher;
 
-    public function __construct()
-    {
+    public function __construct(
+        private readonly Container $container,
+    ) {
         $this->dispatcher = \FastRoute\simpleDispatcher(function (RouteCollector $r) {
             require __DIR__ . '/../routes/web.php';
         });
@@ -39,7 +41,7 @@ class Router implements RequestHandlerInterface
     private function callHandler(array $handler, ServerRequestInterface $request, array $vars): ResponseInterface
     {
         [$class, $method] = $handler;
-        $controller = new $class();
+        $controller = $this->container->get($class);
         return $controller->$method($request, $vars);
     }
 }
