@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\ActivityLog;
+use App\Events\EventDispatcher;
+use App\Events\UserDownloadedFileEvent;
 use Laminas\Diactoros\Response;
-use Laminas\Diactoros\Response\RedirectResponse;
+use Laminas\Diactoros\Stream;
 use Psr\Http\Message\ServerRequestInterface;
 
 class DownloadController extends BaseController
 {
+    public function __construct(
+        private readonly EventDispatcher $dispatcher,
+    ) {
+    }
+
     public function index(ServerRequestInterface $request): \Laminas\Diactoros\Response\HtmlResponse
     {
         return $this->render('download/index');
@@ -20,15 +26,15 @@ class DownloadController extends BaseController
     {
         $userId = (int) (\App\Bootstrap\Auth::instance()->getCurrentUser()['id'] ?? 0);
 
-        ActivityLog::create([
-            'user_id' => $userId,
-            'action'  => 'download',
-        ]);
+        $this->dispatcher->dispatch(new UserDownloadedFileEvent($userId));
 
-        $body = "MZ\x90\x00\x03\x00\x00\x00\x04\x00\x00\x00\xff\xff\x00\x00\xb8\x00\x00\x00\x00\x00\x00\x00\x40\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00This is a dummy .exe file\x00";
+        $body = "This is a dummy .exe file";
+
+        $stream = new Stream('php://memory', 'wb+');
+        $stream->write($body);
 
         return new Response(
-            $body,
+            $stream,
             200,
             [
                 'Content-Type'        => 'application/x-msdownload',

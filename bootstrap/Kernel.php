@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace App\Bootstrap;
 
 use App\Bootstrap\Container;
+use App\Events\EventDispatcher;
+use App\Listeners\UserBoughtCowListener;
+use App\Listeners\UserDownloadedFileListener;
+use App\Events\UserBoughtCowEvent;
+use App\Events\UserDownloadedFileEvent;
 use App\Services\ValidationService\Contracts\ValidatorServiceInterface;
 use App\Services\ValidationService\ValidatorService;
 use Laminas\Diactoros\ServerRequestFactory;
@@ -20,6 +25,12 @@ class Kernel
 
         $container = new Container();
         $container->bind(ValidatorServiceInterface::class, ValidatorService::class);
+
+        $dispatcher = new EventDispatcher($container);
+        $dispatcher->listen(UserBoughtCowEvent::class, UserBoughtCowListener::class);
+        $dispatcher->listen(UserDownloadedFileEvent::class, UserDownloadedFileListener::class);
+        $container->bind(EventDispatcher::class, EventDispatcher::class);
+        $container->setInstance(EventDispatcher::class, $dispatcher);
 
         $request = ServerRequestFactory::fromGlobals();
 

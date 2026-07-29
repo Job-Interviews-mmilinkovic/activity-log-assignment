@@ -16,6 +16,11 @@ class Container
         $this->bindings[$abstract] = $concrete;
     }
 
+    public function setInstance(string $abstract, object $instance): void
+    {
+        $this->instances[$abstract] = $instance;
+    }
+
     public function get(string $class): object
     {
         if (isset($this->instances[$class])) {
