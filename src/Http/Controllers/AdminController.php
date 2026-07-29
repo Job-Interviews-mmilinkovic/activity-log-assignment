@@ -6,11 +6,14 @@ namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Laminas\Diactoros\Response\HtmlResponse;
 use Psr\Http\Message\ServerRequestInterface;
 
 class AdminController extends BaseController
 {
-    public function stats(ServerRequestInterface $request): \Laminas\Diactoros\Response\HtmlResponse
+    private const TRACKED_ACTIONS = ['cow_page_visited', 'download_page_visited', 'buy_cow', 'download'];
+
+    public function stats(ServerRequestInterface $request): HtmlResponse
     {
         $query = ActivityLog::with('user')->orderBy('created_at', 'desc');
 
@@ -33,14 +36,28 @@ class AdminController extends BaseController
         ]);
     }
 
-    public function reports(ServerRequestInterface $request): \Laminas\Diactoros\Response\HtmlResponse
+    public function reports(ServerRequestInterface $request): HtmlResponse
     {
-        $summary = ActivityLog::query()
-            ->select('action', Capsule::raw('COUNT(*) as count'))
-            ->groupBy('action')
-            ->orderBy('count', 'desc')
+        $rows = ActivityLog::query()
+            ->select(
+                Capsule::raw('DATE(created_at) as date'),
+                'action',
+                Capsule::raw('COUNT(*) as count'),
+            )
+            ->whereIn('action', self::TRACKED_ACTIONS)
+            ->groupBy(Capsule::raw('DATE(created_at)'), 'action')
+            ->orderBy('date', 'desc')
             ->get();
 
-        return $this->render('admin/reports', ['summary' => $summary]);
+        $dates = [];
+        foreach ($rows as $row) {
+            $date = $row->date;
+            if (!isset($dates[$date])) {
+                $dates[$date] = array_fill_keys(self::TRACKED_ACTIONS, 0);
+            }
+            $dates[$date][$row->action] = (int) $row->count;
+        }
+
+        return $this->render('admin/reports', ['dates' => $dates]);
     }
 }

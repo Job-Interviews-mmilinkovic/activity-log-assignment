@@ -8,11 +8,23 @@ use App\Bootstrap\Container;
 
 class EventDispatcher
 {
+    private static ?EventDispatcher $globalInstance = null;
+
     private array $listeners = [];
 
     public function __construct(
         private readonly Container $container,
     ) {
+    }
+
+    public static function setInstance(EventDispatcher $dispatcher): void
+    {
+        self::$globalInstance = $dispatcher;
+    }
+
+    public static function instance(): ?self
+    {
+        return self::$globalInstance;
     }
 
     public function listen(string $eventClass, string $listenerClass): void
