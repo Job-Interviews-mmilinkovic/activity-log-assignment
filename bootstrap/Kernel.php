@@ -53,6 +53,7 @@ class Kernel
 
         $middlewareQueue = [
             new AuthMiddleware(),
+            new \App\Http\Middleware\PageViewLogger(),
             new AdminMiddleware(),
             new Router($container),
         ];

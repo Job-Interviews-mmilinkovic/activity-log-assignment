@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Bootstrap\Auth;
-use App\Events\DownloadPageVisitedEvent;
 use App\Events\EventDispatcher;
 use App\Events\UserDownloadedFileEvent;
 use Laminas\Diactoros\Response;
@@ -21,9 +20,6 @@ class DownloadController extends BaseController
 
     public function index(ServerRequestInterface $request): \Laminas\Diactoros\Response\HtmlResponse
     {
-        $userId = (int) (Auth::instance()->getCurrentUser()['id'] ?? 0);
-        $this->dispatcher->dispatch(new DownloadPageVisitedEvent($userId));
-
         return $this->render('download/index');
     }
 
