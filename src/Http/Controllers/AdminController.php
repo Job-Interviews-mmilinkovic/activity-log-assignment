@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\Action;
 use App\Models\ActivityLog;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Laminas\Diactoros\Response\HtmlResponse;
@@ -11,7 +12,12 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class AdminController extends BaseController
 {
-    private const TRACKED_ACTIONS = ['cow_page_visited', 'download_page_visited', 'buy_cow', 'download'];
+    private const TRACKED_ACTIONS = [
+        Action::CowPageVisited,
+        Action::DownloadPageVisited,
+        Action::BuyCow,
+        Action::Download,
+    ];
 
     public function stats(ServerRequestInterface $request): HtmlResponse
     {
@@ -23,8 +29,16 @@ class AdminController extends BaseController
             $query->where('action', $params['action']);
         }
 
-        if (!empty($params['user_id'])) {
-            $query->where('user_id', (int) $params['user_id']);
+        if (!empty($params['email'])) {
+            $query->whereHas('user', fn($q) => $q->where('email', 'like', '%' . $params['email'] . '%'));
+        }
+
+        if (!empty($params['date_from'])) {
+            $query->where('created_at', '>=', $params['date_from'] . ' 00:00:00');
+        }
+
+        if (!empty($params['date_to'])) {
+            $query->where('created_at', '<=', $params['date_to'] . ' 23:59:59');
         }
 
         $logs = $query->get();
@@ -32,7 +46,9 @@ class AdminController extends BaseController
         return $this->render('admin/stats', [
             'logs'         => $logs,
             'filterAction' => $params['action'] ?? '',
-            'filterUserId' => $params['user_id'] ?? '',
+            'filterEmail'  => $params['email'] ?? '',
+            'filterDateFrom' => $params['date_from'] ?? '',
+            'filterDateTo'   => $params['date_to'] ?? '',
         ]);
     }
 
@@ -44,16 +60,17 @@ class AdminController extends BaseController
                 'action',
                 Capsule::raw('COUNT(*) as count'),
             )
-            ->whereIn('action', self::TRACKED_ACTIONS)
+            ->whereIn('action', array_map(fn(Action $a) => $a->value, self::TRACKED_ACTIONS))
             ->groupBy(Capsule::raw('DATE(created_at)'), 'action')
             ->orderBy('date', 'desc')
             ->get();
 
+        $actionValues = array_map(fn(Action $a) => $a->value, self::TRACKED_ACTIONS);
         $dates = [];
         foreach ($rows as $row) {
             $date = $row->date;
             if (!isset($dates[$date])) {
-                $dates[$date] = array_fill_keys(self::TRACKED_ACTIONS, 0);
+                $dates[$date] = array_fill_keys($actionValues, 0);
             }
             $dates[$date][$row->action] = (int) $row->count;
         }
