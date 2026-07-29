@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Bootstrap\Auth;
+use App\Managers\Users\DTO\StoreUserDTO;
+use App\Managers\Users\UserStoreManager;
 use App\Models\User;
 use App\Services\ValidationService\Contracts\ValidatorServiceInterface;
 use Laminas\Diactoros\Response\HtmlResponse;
@@ -15,6 +17,7 @@ class AuthController
 {
     public function __construct(
         private readonly ValidatorServiceInterface $validator,
+        private readonly UserStoreManager $userStore,
     ) {
     }
 
@@ -31,8 +34,8 @@ class AuthController
             return $this->render('auth/login', ['error' => $result->getFirstError()]);
         }
 
-        $dto = $result->getData();
-        $authResult = Auth::instance()->login($dto->email, $dto->password);
+        $data = $result->getData();
+        $authResult = Auth::instance()->login($data['email'], $data['password']);
 
         if ($authResult['error']) {
             return $this->render('auth/login', ['error' => $authResult['message']]);
@@ -54,19 +57,13 @@ class AuthController
             return $this->render('auth/register', ['error' => $result->getFirstError()]);
         }
 
-        $dto = $result->getData();
+        $data = $result->getData();
 
-        if (User::where('email', $dto->email)->exists()) {
+        if (User::where('email', $data['email'])->exists()) {
             return $this->render('auth/register', ['error' => 'Email is already taken.']);
         }
 
-        User::create([
-            'email'    => $dto->email,
-            'password' => password_hash($dto->password, PASSWORD_BCRYPT, ['cost' => 10]),
-            'name'     => $dto->name,
-            'role_id'  => 2,
-            'isactive' => 1,
-        ]);
+        $this->userStore->store(new StoreUserDTO(...$data));
 
         return new RedirectResponse('/login');
     }

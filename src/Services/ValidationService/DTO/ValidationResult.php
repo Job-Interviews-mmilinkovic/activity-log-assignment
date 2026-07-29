@@ -29,8 +29,8 @@ class ValidationResult
         return $first ?? 'Validation failed.';
     }
 
-    public function getData(): mixed
+    public function getData(): array
     {
-        return $this->data;
+        return $this->data?->getData() ?? [];
     }
 }

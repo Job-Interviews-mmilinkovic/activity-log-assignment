@@ -12,4 +12,13 @@ class RegisterDTO
         public readonly string $password,
     ) {
     }
+
+    public function getData(): array
+    {
+        return [
+            'name'     => $this->name,
+            'email'    => $this->email,
+            'password' => $this->password,
+        ];
+    }
 }

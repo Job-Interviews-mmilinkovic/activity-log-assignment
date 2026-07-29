@@ -11,4 +11,12 @@ class LoginDTO
         public readonly string $password,
     ) {
     }
+
+    public function getData(): array
+    {
+        return [
+            'email'    => $this->email,
+            'password' => $this->password,
+        ];
+    }
 }
