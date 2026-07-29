@@ -2,26 +2,20 @@
 
 ## Architecture Overview
 
-This project follows the MVC pattern with a Service-oriented architecture.
+This project follows a layered architecture with middleware and controllers.
 
-The goal is to keep business logic isolated from HTTP, persistence, and infrastructure concerns.
+The goal is to keep HTTP, business logic, and persistence concerns separated.
 
 ```
 HTTP Request
     ↓
-Middleware
+Middleware (PSR-15)
     ↓
-Request Validation
+Router (FastRoute)
     ↓
 Controller
     ↓
-DTO
-    ↓
-Service
-    ↓
-Manager
-    ↓
-Database / Cache
+Response
 ```
 
 ---
@@ -36,8 +30,6 @@ Responsibilities:
 
 * Authentication
 * Authorization
-* Rate limiting
-* Locale detection
 * Request preprocessing
 * Other cross-cutting concerns
 
@@ -45,180 +37,35 @@ Middleware must never contain business logic.
 
 ---
 
+## Router
+
+Routes are defined in `routes/web.php` using FastRoute.
+
+The Router class (`bootstrap/Router.php`) loads the route file and dispatches requests to controllers.
+
+---
+
 ## Controllers
 
-Controllers are responsible only for coordinating the request.
-
-Think of a controller as a traffic controller—it receives a request and forwards it to the appropriate service.
+Controllers receive the request and return a PSR-7 response.
 
 Responsibilities:
 
-* Receive validated requests
-* Create DTOs
-* Call Services
+* Receive requests
+* Call services / auth
 * Return HTTP responses
 
-Controllers must never:
-
-* Contain business logic
-* Perform database queries
-* Communicate directly with the cache
-* Contain complex calculations
-
-Flow:
-
-```
-Request
-    ↓
-Controller
-    ↓
-DTO
-    ↓
-Service
-```
-
----
-
-## DTOs (Data Transfer Objects)
-
-DTOs are used to transfer structured data between Controllers and Services.
-
-Responsibilities:
-
-* Strong typing
-* Immutable data
-* Clear contracts between layers
-
-DTOs should not contain business logic.
-
----
-
-## Services
-
-Services contain all business logic.
-
-Each service represents a business domain and is responsible for answering **why** and **how** a business process works.
-
-Examples:
-
-* SubscriptionService
-* ExperienceService
-* UserService
-
-Services may:
-
-* Validate business rules
-* Calculate values
-* Coordinate multiple Managers
-* Trigger events
-* Call external integrations when part of the business process
-
-Services must never perform persistence directly.
-
-Instead, Services delegate persistence to Managers.
-
-Example:
-
-```
-Controller
-    ↓
-SubscriptionService
-        ↓
-SubscriptionManager
-            ↓
-Database
-```
-
-Each business domain should have its own directory.
-
-Example:
-
-```
-Services/
-    Subscription/
-        DTO/
-        Contracts/
-        Enums/
-        Exceptions/
-        Mappers/
-        SubscriptionService.php
-```
-
-Additional classes such as Value Objects, Policies, Specifications, or Helpers may be added when they naturally belong to the domain.
-
----
-
-## Managers
-
-Managers are responsible for persistence and infrastructure operations.
-
-Their responsibility is **how data is stored**, not **why it is stored**.
-
-Responsibilities:
-
-* Insert records
-* Update records
-* Delete records
-* Bulk operations
-* Cache operations
-* Database transactions
-* Exception handling
-* Query optimization
-* Safe persistence
-
-Managers may interact with:
-
-* Database
-* Redis
-* Cache
-* Filesystem
-* Search indexes
-
-Managers must never contain business rules.
-
-Example:
-
-```
-SubscriptionService
-
-Checks:
-
-✔ User exists
-
-✔ User is active
-
-✔ Selected plan exists
-
-✔ Payment succeeded
-
-✔ User is not already subscribed
-
-↓
-
-SubscriptionManager
-
-Stores:
-
-- subscription
-- payment record
-- cache updates
-```
+Controllers must never contain raw database queries.
 
 ---
 
 # General Principles
 
 * Keep Controllers thin.
-* Keep Services focused on business logic.
-* Keep Managers focused on persistence.
-* Use dependency injection.
-* Prefer composition to inheritance.
-* Use constructor injection.
 * Use strict typing.
 * Keep methods small and focused.
 * One class should have one clear responsibility.
 * Avoid duplicated logic.
-* Never bypass the defined application flow.
 
 ---
 
@@ -227,23 +74,26 @@ Stores:
 ```
 HTTP Request
     ↓
-Middleware
+Session Start
     ↓
-Request Validation
+Middleware (Auth check)
     ↓
-Controller
-    ↓
-DTO
-    ↓
-Service
-    ↓
-Manager
-    ↓
-Database / Cache
-    ↓
-Service
+Router
     ↓
 Controller
     ↓
-HTTP Response
+Response
 ```
+
+---
+
+# Tech Stack
+
+| Component | Library |
+|---|---|
+| PHP | 8.3+ |
+| Database ORM | illuminate/database (Eloquent standalone) |
+| Routing | nikic/fast-route |
+| PSR-7/15 | laminas-diactoros, relay/relay |
+| Auth | phpauth/phpauth |
+| Debugging | symfony/var-dumper |

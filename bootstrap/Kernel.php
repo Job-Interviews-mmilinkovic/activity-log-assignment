@@ -12,10 +12,12 @@ class Kernel
 {
     public function run(): void
     {
+        session_start();
+
         $request = ServerRequestFactory::fromGlobals();
 
         $middlewareQueue = [
-//            new \App\Http\Middleware\AuthMiddleware(),
+            new \App\Http\Middleware\AuthMiddleware(),
             new \App\Bootstrap\Router(),
         ];
 

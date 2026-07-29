@@ -10,9 +10,14 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        $hash = password_hash('super.admin', PASSWORD_BCRYPT, ['cost' => 10]);
+
         $this->table('users')->insert([
-            'name'  => 'Admin',
-            'email' => 'admin@example.com',
+            'email'    => 'super.admin@yopmail.com',
+            'password' => $hash,
+            'name'     => 'Super Admin',
+            'role_id'  => 1,
+            'isactive' => 1,
         ]);
     }
 }

@@ -11,10 +11,12 @@ return new class
     {
         Capsule::schema()->create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('email', 100)->unique();
+            $table->string('password', 255);
             $table->string('name');
-            $table->string('password');
-            $table->string('email')->unique();
-            $table->timestamps();
+            $table->integer('role_id')->default(1);
+            $table->boolean('isactive')->default(0);
+            $table->timestamp('dt')->useCurrent();
         });
     }
 
