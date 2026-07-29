@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Container;
+namespace App\Bootstrap;
 
 use ReflectionClass;
 

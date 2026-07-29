@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Bootstrap;
 
-use App\Container\Container;
+use App\Bootstrap\Container;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use Laminas\Diactoros\Response;

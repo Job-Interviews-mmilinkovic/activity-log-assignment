@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Bootstrap\Auth;
-use App\Bootstrap\DatabaseManager;
+use App\Models\User;
 use App\Services\ValidationService\Contracts\ValidatorServiceInterface;
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Psr\Http\Message\ServerRequestInterface;
@@ -57,14 +56,11 @@ class AuthController
 
         $dto = $result->getData();
 
-        DatabaseManager::boot();
-
-        $existing = Capsule::table('users')->where('email', $dto->email)->first();
-        if ($existing) {
+        if (User::where('email', $dto->email)->exists()) {
             return $this->render('auth/register', ['error' => 'Email is already taken.']);
         }
 
-        Capsule::table('users')->insert([
+        User::create([
             'email'    => $dto->email,
             'password' => password_hash($dto->password, PASSWORD_BCRYPT, ['cost' => 10]),
             'name'     => $dto->name,

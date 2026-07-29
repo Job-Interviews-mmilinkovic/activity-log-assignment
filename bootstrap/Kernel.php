@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Bootstrap;
 
-use App\Container\Container;
+use App\Bootstrap\Container;
 use App\Services\ValidationService\Contracts\ValidatorServiceInterface;
 use App\Services\ValidationService\ValidatorService;
 use Laminas\Diactoros\ServerRequestFactory;
@@ -16,6 +16,7 @@ class Kernel
     public function run(): void
     {
         session_start();
+        DatabaseManager::boot();
 
         $container = new Container();
         $container->bind(ValidatorServiceInterface::class, ValidatorService::class);
