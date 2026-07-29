@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Database;
+namespace App\Bootstrap;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 

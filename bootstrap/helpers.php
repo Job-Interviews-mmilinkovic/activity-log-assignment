@@ -29,3 +29,13 @@ if (!function_exists('config')) {
         return $value;
     }
 }
+
+if (!function_exists('dd')) {
+    function dd(mixed ...$vars): never
+    {
+        foreach ($vars as $var) {
+            dump($var);
+        }
+        exit(1);
+    }
+}
