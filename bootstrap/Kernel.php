@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Bootstrap;
 
-use App\Bootstrap\Container;
 use App\Events\EventDispatcher;
 use App\Events\CowPageVisitedEvent;
 use App\Events\DownloadPageVisitedEvent;
@@ -13,6 +12,8 @@ use App\Events\UserDownloadedFileEvent;
 use App\Events\UserLoggedInEvent;
 use App\Events\UserLoggedOutEvent;
 use App\Events\UserRegisteredEvent;
+use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\AuthMiddleware;
 use App\Listeners\CowPageVisitedListener;
 use App\Listeners\DownloadPageVisitedListener;
 use App\Listeners\UserBoughtCowListener;
@@ -51,7 +52,8 @@ class Kernel
         $request = ServerRequestFactory::fromGlobals();
 
         $middlewareQueue = [
-            new \App\Http\Middleware\AuthMiddleware(),
+            new AuthMiddleware(),
+            new AdminMiddleware(),
             new Router($container),
         ];
 

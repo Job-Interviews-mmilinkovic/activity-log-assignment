@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Bootstrap\Auth;
-use App\Models\User;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -20,24 +19,8 @@ class AuthMiddleware implements MiddlewareInterface
     {
         $path = $request->getUri()->getPath();
 
-        $auth = Auth::instance();
-
-        if (!in_array($path, $this->publicPaths, true) && !$auth->isLogged()) {
+        if (!in_array($path, $this->publicPaths, true) && !Auth::instance()->isLogged()) {
             return new RedirectResponse('/login');
-        }
-
-        if (str_starts_with($path, '/admin')) {
-            $currentUser = $auth->getCurrentUser();
-
-            if (!$currentUser) {
-                return new RedirectResponse('/login');
-            }
-
-            $user = User::find($currentUser['id']);
-
-            if (!$user || !$user->role || $user->role->name !== 'admin') {
-                return new RedirectResponse('/');
-            }
         }
 
         return $handler->handle($request);

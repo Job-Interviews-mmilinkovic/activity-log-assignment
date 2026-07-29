@@ -29,5 +29,7 @@ $r->addRoute('GET', '/download', [DownloadController::class, 'index']);
 $r->addRoute('POST', '/download', [DownloadController::class, 'download']);
 
 // Admin
-$r->addRoute('GET', '/admin/stats', [AdminController::class, 'stats']);
-$r->addRoute('GET', '/admin/reports', [AdminController::class, 'reports']);
+$r->addGroup('/admin', function (RouteCollector $r) {
+    $r->addRoute('GET', '/stats', [AdminController::class, 'stats']);
+    $r->addRoute('GET', '/reports', [AdminController::class, 'reports']);
+});
