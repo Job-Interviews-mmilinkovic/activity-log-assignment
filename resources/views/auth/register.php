@@ -20,6 +20,7 @@
         <h1>Register</h1>
         <?php if (isset($error)): ?><div class="error"><?= htmlspecialchars($error) ?></div><?php endif; ?>
         <form method="post" action="/register">
+            <?= csrf_field() ?>
             <label for="name">Name</label>
             <input type="text" name="name" id="name" required>
             <label for="email">Email</label>

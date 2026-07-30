@@ -14,6 +14,7 @@ use App\Events\UserLoggedOutEvent;
 use App\Events\UserRegisteredEvent;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\AuthMiddleware;
+use App\Http\Middleware\CsrfMiddleware;
 use App\Listeners\CowPageVisitedListener;
 use App\Listeners\DownloadPageVisitedListener;
 use App\Listeners\UserBoughtCowListener;
@@ -52,6 +53,7 @@ class Kernel
         $request = ServerRequestFactory::fromGlobals();
 
         $middlewareQueue = [
+            new CsrfMiddleware(),
             new AuthMiddleware(),
             new \App\Http\Middleware\PageViewLogger(),
             new AdminMiddleware(),

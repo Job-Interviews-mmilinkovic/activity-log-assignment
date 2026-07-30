@@ -30,6 +30,7 @@
             <a href="/admin/reports">Reports</a>
         <?php endif; ?>
         <form method="post" action="/logout" style="display:inline">
+            <?= csrf_field() ?>
             <button type="submit">Logout</button>
         </form>
     </nav>

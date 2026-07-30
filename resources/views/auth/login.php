@@ -20,6 +20,7 @@
         <h1>Login</h1>
         <?php if (isset($error)): ?><div class="error"><?= htmlspecialchars($error) ?></div><?php endif; ?>
         <form method="post" action="/login">
+            <?= csrf_field() ?>
             <label for="email">Email</label>
             <input type="email" name="email" id="email" required>
             <label for="password">Password</label>
